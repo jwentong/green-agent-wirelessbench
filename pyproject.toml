@@ -1,13 +1,25 @@
 [project]
-name = "green-agent-template"
-version = "0.1.0"
-description = "A template for A2A green agents"
+name = "wchw-green-agent"
+version = "1.0.0"
+description = "Green Agent for WCHW (Wireless Communication Homework) Benchmark - UC Berkeley AgentBeats Competition"
 readme = "README.md"
 requires-python = ">=3.13"
+authors = [
+    {name = "Jingwen Tong", email = "jingwen.tong@example.com"}
+]
+keywords = [
+    "a2a",
+    "agent",
+    "wireless-communication",
+    "benchmark",
+    "evaluation",
+    "agentbeats"
+]
 dependencies = [
     "a2a-sdk[http-server]>=0.3.20",
     "pydantic>=2.12.5",
     "uvicorn>=0.38.0",
+    "aiofiles>=24.1.0",
 ]
 
 [project.optional-dependencies]

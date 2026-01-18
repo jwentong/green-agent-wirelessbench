@@ -1,37 +1,64 @@
-# A2A Agent Template
+# WCHW Green Agent - Wireless Communication Benchmark
 
-A minimal template for building [A2A (Agent-to-Agent)](https://a2a-protocol.org/latest/) green agents compatible with the [AgentBeats](https://agentbeats.dev) platform.
+A Green Agent for evaluating AI agents on the **WCHW (Wireless Communication Homework)** benchmark, built for the UC Berkeley RDI Foundation's [AgentBeats](https://agentbeats.dev) platform.
 
-## Project Structure
+## 📡 Overview
+
+This Green Agent evaluates **Purple Agents** (wireless communication problem solvers) using the [A2A (Agent-to-Agent)](https://a2a-protocol.org/latest/) protocol. The WCHW benchmark covers advanced telecommunications topics including:
+
+- **Information Theory**: Shannon capacity, entropy, channel coding
+- **Channel Modeling**: Path loss, fading, MIMO, propagation
+- **Signal Processing**: Modulation, detection, filtering
+- **System Design**: Link budget, resource allocation
+
+## 🏗️ Project Structure
 
 ```
-src/
-├─ server.py      # Server setup and agent card configuration
-├─ executor.py    # A2A request handling
-├─ agent.py       # Your agent implementation goes here
-└─ messenger.py   # A2A messaging utilities
-tests/
-└─ test_agent.py  # Agent tests
-Dockerfile        # Docker configuration
-pyproject.toml    # Python dependencies
-.github/
-└─ workflows/
-   └─ test-and-publish.yml # CI workflow
+├── src/
+│   ├── server.py      # Server setup and agent card configuration
+│   ├── executor.py    # A2A request handling
+│   ├── agent.py       # WCHW evaluator implementation
+│   └── messenger.py   # A2A messaging utilities
+├── data/
+│   ├── wchw_test.jsonl      # Test problems
+│   └── wchw_validate.jsonl  # Validation problems
+├── config/
+│   └── agentbeats.json      # AgentBeats configuration
+├── tests/
+│   └── test_agent.py        # Agent tests
+├── Dockerfile
+└── pyproject.toml
 ```
 
-## Getting Started
+## 🎯 Scoring System
 
-1. **Create your repository** - Click "Use this template" to create your own repository from this template
+The evaluator supports multiple answer types with intelligent scoring:
 
-2. **Implement your agent** - Add your agent logic to [`src/agent.py`](src/agent.py)
+| Answer Type | Example | Scoring Method |
+|-------------|---------|----------------|
+| Numeric with units | `6.87 Mbps`, `240 m` | Relative error tolerance |
+| Scientific notation | `5.42e-6`, `2.2×10^-8` | Numeric comparison |
+| Mathematical formulas | `1/(2τ_0)`, `A^2 T` | Symbolic matching |
+| Text/conceptual | Phase sequences | Keyword matching |
 
-3. **Configure your agent card** - Fill in your agent's metadata (name, skills, description) in [`src/server.py`](src/server.py)
+### Scoring Rules
 
-4. **Write your tests** - Add custom tests for your agent in [`tests/test_agent.py`](tests/test_agent.py)
+| Accuracy | Score |
+|----------|-------|
+| Exact match (<1% error) | 1.0 |
+| Close match (<5% error) | 0.9 |
+| Acceptable (<10% error) | 0.7 |
+| Unit conversion error | 0.5 |
+| Factor of 2 error | 0.3 |
 
-For a concrete example of implementing a green agent using this template, see this [draft PR](https://github.com/RDI-Foundation/green-agent-template/pull/3).
+## 🚀 Getting Started
 
-## Running Locally
+### Prerequisites
+
+- Python 3.13+
+- [uv](https://github.com/astral-sh/uv) package manager
+
+### Installation
 
 ```bash
 # Install dependencies
@@ -41,47 +68,97 @@ uv sync
 uv run src/server.py
 ```
 
-## Running with Docker
+### Configuration
+
+The agent listens on port 9009 by default. Override with:
+
+```bash
+uv run src/server.py --host 0.0.0.0 --port 8080
+```
+
+## 🐳 Docker Deployment
 
 ```bash
 # Build the image
-docker build -t my-agent .
+docker build -t wchw-green-agent .
 
 # Run the container
-docker run -p 9009:9009 my-agent
+docker run -p 9009:9009 wchw-green-agent
 ```
 
-## Testing
+## 📝 API Usage
 
-Run A2A conformance tests against your agent.
+### Request Format
+
+Send an evaluation request with participants and config:
+
+```json
+{
+  "participants": {
+    "wireless_solver": "http://purple-agent:8080"
+  },
+  "config": {
+    "num_problems": 10,
+    "timeout": 60,
+    "problem_indices": [0, 5, 10]  // optional
+  }
+}
+```
+
+### Response Format
+
+The agent returns structured results:
+
+```json
+{
+  "summary": {
+    "total_problems": 100,
+    "evaluated": 10,
+    "average_score": 0.85,
+    "max_score": 1.0,
+    "min_score": 0.5,
+    "by_answer_type": {
+      "numeric": {"count": 8, "average": 0.9},
+      "formula": {"count": 2, "average": 0.7}
+    }
+  },
+  "results": [...]
+}
+```
+
+## 🧪 Testing
 
 ```bash
 # Install test dependencies
 uv sync --extra test
 
-# Start your agent (uv or docker; see above)
+# Start your agent
+uv run src/server.py &
 
-# Run tests against your running agent URL
+# Run tests
 uv run pytest --agent-url http://localhost:9009
 ```
 
-## Publishing
+## 📊 Sample Problems
 
-The repository includes a GitHub Actions workflow that automatically builds, tests, and publishes a Docker image of your agent to GitHub Container Registry.
+| Question | Expected Answer | Category |
+|----------|-----------------|----------|
+| Shannon capacity. B=50 MHz, SNR=0.1. Compute C (Mbps). | 6.87 Mbps | Information Theory |
+| Two-ray critical distance. f_c=900 MHz, h_t=10 m, h_r=2 m. | 240 m | Channel Modeling |
+| Convert 30 dBm to watts. | 1.00 W | Signal Processing |
 
-If your agent needs API keys or other secrets, add them in Settings → Secrets and variables → Actions → Repository secrets. They'll be available as environment variables during CI tests.
+## 🔗 Links
 
-- **Push to `main`** → publishes `latest` tag:
-```
-ghcr.io/<your-username>/<your-repo-name>:latest
-```
+- [A2A Protocol Documentation](https://a2a-protocol.org/latest/)
+- [AgentBeats Platform](https://agentbeats.dev)
+- [UC Berkeley RDI Foundation](https://rdi.berkeley.edu/)
 
-- **Create a git tag** (e.g. `git tag v1.0.0 && git push origin v1.0.0`) → publishes version tags:
-```
-ghcr.io/<your-username>/<your-repo-name>:1.0.0
-ghcr.io/<your-username>/<your-repo-name>:1
-```
+## 📄 License
 
-Once the workflow completes, find your Docker image in the Packages section (right sidebar of your repository). Configure the package visibility in package settings.
+MIT License - see LICENSE file for details.
 
-> **Note:** Organization repositories may need package write permissions enabled manually (Settings → Actions → General). Version tags must follow [semantic versioning](https://semver.org/) (e.g., `v1.0.0`).
+## 👤 Author
+
+**Jingwen Tong**
+
+UC Berkeley RDI Foundation AgentBeats Competition

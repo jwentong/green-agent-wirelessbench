@@ -1,0 +1,122 @@
+{
+  "name": "WCHW Green Agent",
+  "version": "1.0.0",
+  "description": "Green Agent for WCHW Benchmark Assessment - UC Berkeley RDI Foundation AgentBeats Competition",
+  "author": "Jingwen Tong",
+
+  "assessment": {
+    "name": "WCHW Benchmark",
+    "description": "Wireless Communication Homework benchmark with test problems covering information theory, channel modeling, signal processing, and system design",
+    "category": "Telecommunications",
+    "difficulty": "Advanced"
+  },
+
+  "datasets": {
+    "test": {
+      "name": "wchw_test",
+      "path": "data/wchw_test.jsonl",
+      "format": "jsonl",
+      "description": "WCHW test problems for evaluation"
+    },
+    "validate": {
+      "name": "wchw_validate",
+      "path": "data/wchw_validate.jsonl", 
+      "format": "jsonl",
+      "description": "WCHW validation problems for development"
+    }
+  },
+
+  "scoring": {
+    "primary_metric": "accuracy",
+    "scoring_type": "numeric",
+    "tolerance": 0.05,
+    "partial_credit": true,
+    "answer_types": [
+      "numeric_with_units",
+      "scientific_notation",
+      "mathematical_formula",
+      "text_conceptual"
+    ],
+    "scoring_rules": {
+      "exact_match": 1.0,
+      "close_match_5pct": 0.9,
+      "acceptable_10pct": 0.7,
+      "unit_error": 0.5,
+      "factor_of_2_error": 0.3
+    }
+  },
+
+  "agent": {
+    "protocol": "A2A",
+    "host": "0.0.0.0",
+    "port": 9009,
+    "health_endpoint": "/health",
+    "agent_card_endpoint": "/.well-known/agent-card.json"
+  },
+
+  "participants": {
+    "required_roles": ["wireless_solver"],
+    "description": "Purple agents should be capable of solving wireless communication problems"
+  },
+
+  "config_schema": {
+    "num_problems": {
+      "type": "integer",
+      "required": true,
+      "description": "Number of problems to evaluate"
+    },
+    "timeout": {
+      "type": "integer",
+      "default": 60,
+      "description": "Timeout in seconds for each problem"
+    },
+    "problem_indices": {
+      "type": "array",
+      "required": false,
+      "description": "Specific problem indices to evaluate (optional)"
+    }
+  },
+
+  "categories": [
+    {
+      "id": "information_theory",
+      "name": "Information Theory",
+      "description": "Shannon capacity, entropy, mutual information, channel coding",
+      "weight": 0.25
+    },
+    {
+      "id": "channel_modeling",
+      "name": "Channel Modeling", 
+      "description": "Path loss, fading models, MIMO channels, propagation",
+      "weight": 0.25
+    },
+    {
+      "id": "signal_processing",
+      "name": "Signal Processing",
+      "description": "Modulation, detection, filtering, sampling",
+      "weight": 0.25
+    },
+    {
+      "id": "system_design",
+      "name": "System Design",
+      "description": "Link budget, network planning, resource allocation",
+      "weight": 0.25
+    }
+  ],
+
+  "sample_request": {
+    "participants": {
+      "wireless_solver": "http://localhost:8080"
+    },
+    "config": {
+      "num_problems": 10,
+      "timeout": 60
+    }
+  },
+
+  "timeouts": {
+    "problem_timeout_seconds": 60,
+    "session_timeout_seconds": 3600,
+    "total_timeout_seconds": 7200
+  }
+}
